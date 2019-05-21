@@ -1,11 +1,19 @@
 let walls = [];
 let ray;
-let viewDistance = 250;
+let viewDistance = 400;
 let showWalls = false;
 let numRays = 1000;
+let i = 0;
+let speed = 5;
 
 function setup(){
     let canvas = createCanvas(1900,900);
+    randomize(); 
+    ray = new Ray(width/2, height/2);
+}
+
+function randomize(){
+    walls = [];
     for(let i = 0; i < 10; i++){
         walls.push(new Boundary(random(width), random(height), random(width), random(height)));
         walls.push(new Boundary(0,0,0,height));
@@ -13,7 +21,6 @@ function setup(){
         walls.push(new Boundary(width,height,width,0));
         walls.push(new Boundary(0,0,width,0));
     }
-    ray = new Ray(width/2, height/2);
 }
 
 function draw(){
@@ -57,7 +64,18 @@ function draw(){
             walls[wall].show();
         }
     }
-    ray.move(mouseX, mouseY);
+
+    fill(0);
+    stroke(0);
+    ellipse(ray.pos.x, ray.pos.y, 10, 10);
+
+    i++;
+    ray.move(cos(radians(i/5))*width/3+width/2, sin(radians(i/5))*height/3+height/2);
+
+    if(i == 360*speed){
+        i = 0;
+        randomize();
+    }
 }
 
 function mousePressed(){
