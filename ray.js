@@ -2,6 +2,19 @@ class Ray{
     constructor(x, y){
         this.pos = createVector(x,y);
         this.dir = createVector(1,0);
+        this.v = createVector(0,0);
+    }
+
+    vel(x, y){
+        this.v.x = x;
+        this.v.y = y;
+        this.v.normalize();
+    }
+
+    velShift(x, y){
+        let temp = createVector(x, y);
+        this.v.add(temp);
+        this.v.normalize();
     }
 
     show(){
@@ -25,8 +38,13 @@ class Ray{
     }
 
     move(x, y){
-        this.pos.x = x;
-        this.pos.y = y;
+        if(x && y){
+            this.pos.x = x;
+            this.pos.y = y;
+        } else {
+            this.pos.x += this.v.x;
+            this.pos.y += this.v.y;
+        }
     }
 
     cast(boundary){

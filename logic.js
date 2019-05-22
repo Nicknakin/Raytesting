@@ -8,13 +8,13 @@ let speed = 5;
 
 function setup(){
     let canvas = createCanvas(1900,900);
-    randomize(); 
+    randomize(10); 
     ray = new Ray(width/2, height/2);
 }
 
-function randomize(){
+function randomize(num){
     walls = [];
-    for(let i = 0; i < 10; i++){
+    for(let i = 0; i < num; i++){
         walls.push(new Boundary(random(width), random(height), random(width), random(height)));
         walls.push(new Boundary(0,0,0,height));
         walls.push(new Boundary(0,height,width,width));
@@ -69,13 +69,9 @@ function draw(){
     stroke(0);
     ellipse(ray.pos.x, ray.pos.y, 10, 10);
 
-    i++;
-    ray.move(cos(radians(i/5))*width/3+width/2, sin(radians(i/5))*height/3+height/2);
-
-    if(i == 360*speed){
-        i = 0;
-        randomize();
-    }
+    ray.move();
+    ray.vel(mouseX-ray.pos.x, mouseY-ray.pos.y);
+    ray.v.mult(p5.Vector.dist(createVector(mouseX, mouseY), ray.pos)/10);
 }
 
 function mousePressed(){
@@ -85,3 +81,24 @@ function mousePressed(){
 function mouseReleased(){
     showWalls = false;
 }
+
+/*function keyPressed(){
+    if(keyCode == UP_ARROW){
+        ray.velShift(0,-1);
+    }
+    if(keyCode == DOWN_ARROW){
+        ray.vel(0,1);
+    }
+    if(keyCode == LEFT_ARROW){
+        ray.velShift(-1,0);
+    }
+    if(keyCode == RIGHT_ARROW){
+        ray.vel(1,0);
+    }
+}
+
+function keyRelease(){
+    if(keyCode == UP_ARROW || keyCode == DOWN_ARROW || keyCode == LEFT_ARROW || keyCode == RIGHT_ARROW){
+        ray.vel(0, 0);
+    }
+}*/
