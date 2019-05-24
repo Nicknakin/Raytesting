@@ -2,6 +2,7 @@ class Ray{
     constructor(x, y){
         this.pos = createVector(x,y);
         this.dir = createVector(1,0);
+        this.viewDir = createVector(1,0);
         this.v = createVector(0,0);
     }
 
@@ -18,11 +19,9 @@ class Ray{
     }
 
     show(){
-        stroke(255);
-        push();
-        translate(this.pos.x, this.pos.y);
-        line(0, 0, this.dir.x*20, this.dir.y*20);
-        pop();
+        fill(255);
+        stroke(0);
+        ellipse(this.pos.x, this.pos.y, 5, 5);
     }
 
     setDir(x, y){
@@ -35,6 +34,16 @@ class Ray{
         this.dir.x = x;
         this.dir.y = y;
         this.dir.normalize();
+    }
+
+    setViewDir(x, y){
+        this.viewDir.x = x;
+        this.viewDir.y = y;
+        this.viewDir.normalize();
+    }
+
+    getViewDir(){
+        return (degrees(atan2(this.viewDir.y, this.viewDir.x))+360)%360;
     }
 
     move(x, y){
@@ -65,8 +74,8 @@ class Ray{
         const t = (((x1-x3)*(y3-y4))-((y1-y3)*(x3-x4)))/denominator;
         const u = -(((x1-x2)*(y1-y3))-((y1-y2)*(x1-x3)))/denominator;
 
-        if(t > 0 && t < 1 && u > 0){
-            return createVector(x1+t*(x2-x1), y1+t*(y2-y1));
+        if(t >= 0 && t <= 1 && u >= 0){
+            return createVector(x1+t*(x2-x1), y1+t*(y2-y1), p5.Vector.dist(createVector(x1+t*(x2-x1), y1+t*(y2-y1)), this.pos));
         }
     }
 }
