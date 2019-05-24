@@ -2,11 +2,13 @@ let walls = [];
 let ray;
 let viewDistance = Infinity;
 let showWalls = true;
-let numRays = 1000;
+let numRays = 950;
 let i = 0;
 let speed = 5;
 let gridDimensions = [19, 9, 100];
 let lookAngle = 0;
+let fov = 110;
+let rotating = true;
 let vertices;
 
 function setup(){
@@ -38,10 +40,33 @@ function randomize(){
 }
 
 function draw(){
-    lookAngle = (lookAngle+.5)%360;
+    if(rotating) lookAngle = (lookAngle+.5)%360;
     ray.setViewDir(cos(radians(lookAngle)), sin(radians(lookAngle)));
-    vertices = [ray.pos];
-    for(let i = ray.getViewDir()-30; i < ray.getViewDir()+30; i+=60/numRays){
+    vertices = [];
+    calcVertices(vertices);
+    background(0);
+
+    if(!showWalls){
+        walls.forEach((wall) => wall.show());
+        fillView(vertices);
+        ray.show();
+    } else{
+        renderWalls(vertices);
+    }
+}
+
+function renderWalls(vertices){
+    rectMode(CENTER);
+    for(viewPoint in vertices){
+        let p = vertices[viewPoint];
+        noFill();
+        stroke(255/p.z*50);
+        rect(viewPoint*width/vertices.length, height/2, viewPoint/width, height*20/p.z);
+    }       
+}
+
+function calcVertices(){
+    for(let i = ray.getViewDir()-fov/2; i < ray.getViewDir()+fov/2; i+=60/numRays){
         ray.setAngle(cos(radians(i)), sin(radians(i)));
         let closest = createVector(ray.pos.x+ray.dir.x*viewDistance, ray.pos.y+ray.dir.y*viewDistance);
         let record = viewDistance;
@@ -58,32 +83,9 @@ function draw(){
             }
         }
         if(record < Infinity){
-            //line(closest.x, closest.y, ray.pos.x, ray.pos.y);
             vertices.push(createVector(closest.x, closest.y, closest.z));
-        }
-        
+        }   
     }
-    background(0);
-
-    if(!showWalls){
-        walls.forEach((wall) => wall.show());
-        fillView(vertices);
-        ray.show();
-    } else{
-        renderWalls(vertices);
-    }
-}
-
-function renderWalls(vertices){
-    rectMode(CENTER);
-        for(viewPoint in vertices){
-            if(viewPoint != 0){
-                let p = vertices[viewPoint];
-                fill(p.z/400*255);
-                stroke(p.z/150*255);
-                rect(viewPoint*width/numRays, height/2, viewPoint/width, height*20/p.z);
-            }
-        }
 }
 
 function mousePressed(){
@@ -92,9 +94,11 @@ function mousePressed(){
 
 function keyTyped(){
     if(key == "m") showWalls = !showWalls;
+    if(key == " ") rotating = !rotating;
 }
 
 function fillView(vertices){
+    vertices.push(ray.pos);
     fill(128);
     stroke(128);
     beginShape();
