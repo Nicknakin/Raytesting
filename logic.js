@@ -1,4 +1,5 @@
 let walls = [];
+let letFill = true;
 let ray;
 let viewDistance = Infinity;
 let showWalls = false;
@@ -48,11 +49,18 @@ function draw(){
 
     if(!showWalls){
         walls.forEach((wall) => wall.show());
-        fillView(vertices);
+        if(letFill) fillView(vertices);
+        else drawRays(vertices);
         ray.show();
     } else{
         renderWalls(vertices);
     }
+}
+
+function drawRays(vertices){
+    fill(128);
+    stroke(128);
+    vertices.forEach(vertex => line(ray.pos.x, ray.pos.y, vertex.x, vertex.y));
 }
 
 function renderWalls(vertices){
@@ -95,6 +103,7 @@ function mousePressed(){
 function keyTyped(){
     if(key == "m") showWalls = !showWalls;
     if(key == " ") rotating = !rotating;
+    if(key == "n") letFill = !letFill;
 }
 
 function fillView(vertices){
