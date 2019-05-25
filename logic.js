@@ -6,7 +6,7 @@ let showWalls = false;
 let numRays = 950;
 let i = 0;
 let speed = 5;
-let gridDimensions = [19, 9, 100];
+let gridDimensions = [38, 18, 50];
 let lookAngle = 0;
 let fov = 110;
 let rotating = true;
@@ -20,26 +20,6 @@ function setup(){
     colorMode(RGB, 255, 255, 255, 255)
 }
 
-function createGrid(dims){
-    for(let i = 0; i < dims[0]*dims[2]; i += dims[2]){
-        for(let k = 0; k < dims[1]*dims[2]; k += dims[2]){
-            walls.push(new Boundary(i, k+dims[2], i+dims[2], k+dims[2]));
-            walls.push(new Boundary(i+dims[2], k+dims[2], i+dims[2], k));
-        }
-    }
-    walls.push(new Boundary(0,0,0,height));
-    walls.push(new Boundary(0,height,width,width));
-    walls.push(new Boundary(width,height,width,0));
-    walls.push(new Boundary(0,0,width,0));
-}
-
-function randomize(){
-    for(let i = 0; i < walls.length/4; i++){
-        let k = random(walls.length);
-         walls.splice(k, 1);  
-    }
-}
-
 function draw(){
     if(rotating) lookAngle = (lookAngle+.5)%360;
     ray.setViewDir(cos(radians(lookAngle)), sin(radians(lookAngle)));
@@ -48,13 +28,33 @@ function draw(){
     background(0);
 
     if(!showWalls){
-        walls.forEach((wall) => wall.show());
         if(letFill) fillView(vertices);
         else drawRays(vertices);
         ray.show();
+        walls.forEach((wall) => wall.show());
     } else{
         renderWalls(vertices);
     }
+}
+
+function createGrid(dims){
+    for(let i = 0; i < dims[0]*dims[2]; i += dims[2]){
+        for(let k = 0; k < dims[1]*dims[2]; k += dims[2]){
+            walls.push(new Boundary(i, k+dims[2], i+dims[2], k+dims[2]));
+            walls.push(new Boundary(i+dims[2], k+dims[2], i+dims[2], k));
+        }
+    }
+}
+
+function randomize(){
+    for(let i = walls.length/4; i < walls.length; i++){
+        let k = random(walls.length);
+         walls.splice(k, 1);  
+    }
+    walls.push(new Boundary(0,0,0,height));
+    walls.push(new Boundary(0,height,width,width));
+    walls.push(new Boundary(width,height,width,0));
+    walls.push(new Boundary(0,0,width,0));
 }
 
 function drawRays(vertices){
@@ -74,19 +74,17 @@ function renderWalls(vertices){
 }
 
 function calcVertices(){
-    for(let i = ray.getViewDir()-fov/2; i < ray.getViewDir()+fov/2; i+=60/numRays){
+    for(let i = ray.getViewDir()-fov/2; i < ray.getViewDir()+fov/2; i+=fov/numRays){
         ray.setAngle(cos(radians(i)), sin(radians(i)));
         let closest = createVector(ray.pos.x+ray.dir.x*viewDistance, ray.pos.y+ray.dir.y*viewDistance);
         let record = viewDistance;
         for(wall in walls){
-            if(p5.Vector.dist(ray.pos, walls[wall].a) < viewDistance || p5.Vector.dist(ray.pos, walls[wall].b) < viewDistance){
-                let pt = ray.cast(walls[wall]);
-                if(pt){
-                    let dist = p5.Vector.dist(pt, ray.pos);
-                    if(dist < record){
-                        record = dist;
-                        closest = pt;
-                    }
+            let pt = ray.cast(walls[wall]);
+            if(pt){
+                let dist = p5.Vector.dist(pt, ray.pos);
+                if(dist < record){
+                    record = dist;
+                    closest = pt;
                 }
             }
         }
