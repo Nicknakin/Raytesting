@@ -74,7 +74,7 @@ function renderWalls(vertices){
 }
 
 function calcVertices(){
-    for(let i = ray.getViewDir()-fov/2; i < ray.getViewDir()+fov/2; i+=60/numRays){
+    for(let i = ray.getViewDir()-fov/2; i < ray.getViewDir()+fov/2; i+=fov/numRays){
         ray.setAngle(cos(radians(i)), sin(radians(i)));
         let closest = createVector(ray.pos.x+ray.dir.x*viewDistance, ray.pos.y+ray.dir.y*viewDistance);
         let record = viewDistance;
