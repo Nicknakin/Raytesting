@@ -52,7 +52,7 @@ function randomize(){
          walls.splice(k, 1);  
     }
     walls.push(new Boundary(0,0,0,height));
-    walls.push(new Boundary(0,height,width,width));
+    walls.push(new Boundary(0,height,width,height));
     walls.push(new Boundary(width,height,width,0));
     walls.push(new Boundary(0,0,width,0));
 }
@@ -67,9 +67,9 @@ function renderWalls(vertices){
     rectMode(CENTER);
     for(viewPoint in vertices){
         let p = vertices[viewPoint];
-        noFill();
+        fill(255/p.z*50);
         stroke(255/p.z*50);
-        rect(viewPoint*width/vertices.length, height/2, viewPoint/width, height*20/p.z);
+        rect(viewPoint*width/numRays, height/2, width/numRays, height*20/p.z);
     }       
 }
 
