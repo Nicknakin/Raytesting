@@ -2,13 +2,13 @@ let walls = [];
 let letFill = true;
 let viewDistance = Infinity;
 let showWalls = false;
-let numRays = 950;
+let numRays = 500;
 let i = 0;
 let speed = 5;
 let gridDimensions = [38, 18, 50];
 let lookAngle = 0;
 let fov = 110;
-let rotating = true;
+let rotating = !true;
 let mapBuffer, tDBuffer, vertices, ray;
 
 function setup(){
@@ -18,26 +18,47 @@ function setup(){
     ray = new Ray(width/2-gridDimensions[2]/2, height/2-gridDimensions[2]/2, mapBuffer);
     createGrid(gridDimensions);
     randomize(); 
-    colorMode(RGB, 255, 255, 255, 255)
+    colorMode(RGB, 255, 255, 255, 255);
+    tDBuffer.colorMode(RGB, 255, 255, 255, 255);
+    mapBuffer.colorMode(RGB, 255, 255, 255, 255)
 }
 
 function draw(){
+    // MOVEMENT
+    //ANGLES
     if(rotating) lookAngle = (lookAngle+.5)%360;
+    if(keyIsDown(RIGHT_ARROW)) lookAngle += 1;
+    if(keyIsDown(LEFT_ARROW)) lookAngle -= 1;
     ray.setViewDir(cos(radians(lookAngle)), sin(radians(lookAngle)));
+
+    //DIRECTIONAL MOVEMENT
+    if(keyIsDown("W".charCodeAt(0)) || keyIsDown(UP_ARROW)) ray.velShift(ray.viewDir.x, ray.viewDir.y);
+    if(keyIsDown("S".charCodeAt(0)) || keyIsDown(DOWN_ARROW)) ray.velShift(-ray.viewDir.x, -ray.viewDir.y);
+
+    if(keyIsDown("A".charCodeAt(0))) ray.velShift(cos(radians(lookAngle-90)), sin(radians(lookAngle-90)));
+    if(keyIsDown("D".charCodeAt(0))) ray.velShift(cos(radians(lookAngle+90)), sin(radians(lookAngle+90)));
+
+    ray.move();
+    ray.vel(0, 0);
+
+    //MATH TO DO BEFORE IMAGES CAN BE DRAWN
     vertices = [];
     calcVertices(vertices);
     background(0);
 
-    image(tDBuffer, 0, 0);
-
+    //DETERMINE WHETHER TO DRAW FULL 3D WORLD WITH MINIMAP OR JUST GRID
     if(!showWalls){
         drawMap(mapBuffer);
         image(mapBuffer, 0, 0);
     } else{
         tDBuffer.background(0);
+        tDBuffer.fill(128,0,0);
+        tDBuffer.rectMode(CORNER);
+        tDBuffer.rect(0, height/2, width, height/2);
         drawWalls3D(tDBuffer, vertices);
         drawMap(mapBuffer);
         mapBuffer.copy(floor(ray.pos.x-100), floor(ray.pos.y-100), 200, 200, 0, 0, 200, 200);
+        image(tDBuffer, 0, 0);
         image(mapBuffer, width-250, height-250, 200, 200, 0, 0 , 200, 200);
     }
 }
