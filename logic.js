@@ -1,7 +1,7 @@
 let walls = [];
 let ray;
 let viewDistance = Infinity;
-let showWalls = true;
+let showWalls = false;
 let numRays = 950;
 let i = 0;
 let speed = 5;
