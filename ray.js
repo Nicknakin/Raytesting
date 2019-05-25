@@ -1,9 +1,10 @@
 class Ray{
-    constructor(x, y){
+    constructor(x, y, context){
         this.pos = createVector(x,y);
         this.dir = createVector(1,0);
         this.viewDir = createVector(1,0);
         this.v = createVector(0,0);
+        this.context = context;
     }
 
     vel(x, y){
@@ -19,9 +20,9 @@ class Ray{
     }
 
     show(){
-        fill(255);
-        stroke(0);
-        ellipse(this.pos.x, this.pos.y, 5, 5);
+        this.context.fill(255);
+        this.context.stroke(0);
+        this.context.ellipse(this.pos.x, this.pos.y, 5, 5);
     }
 
     setDir(x, y){
