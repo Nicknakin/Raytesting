@@ -15,7 +15,7 @@ function setup(){
     let canvas = createCanvas(1900,900);
     tDBuffer = createGraphics(width, height);
     mapBuffer = createGraphics(width, height);
-    ray = new Ray(width/2, height/2, mapBuffer);
+    ray = new Ray(width/2-gridDimensions[2]/2, height/2-gridDimensions[2]/2, mapBuffer);
     createGrid(gridDimensions);
     randomize(); 
     colorMode(RGB, 255, 255, 255, 255)
