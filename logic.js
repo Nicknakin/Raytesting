@@ -2,6 +2,7 @@ let walls = [];
 let letFill = true;
 let viewDistance = Infinity;
 let showWalls = false;
+let showMinimap = true;
 let numRays = 500;
 let i = 0;
 let speed = 5;
@@ -27,16 +28,18 @@ function draw(){
     // MOVEMENT
     //ANGLES
     if(rotating) lookAngle = (lookAngle+.5)%360;
-    if(keyIsDown(RIGHT_ARROW)) lookAngle += 1;
-    if(keyIsDown(LEFT_ARROW)) lookAngle -= 1;
+    if(keyIsDown(RIGHT_ARROW)) lookAngle += 2;
+    if(keyIsDown(LEFT_ARROW)) lookAngle -= 2;
     ray.setViewDir(cos(radians(lookAngle)), sin(radians(lookAngle)));
 
     //DIRECTIONAL MOVEMENT
     if(keyIsDown("W".charCodeAt(0)) || keyIsDown(UP_ARROW)) ray.velShift(ray.viewDir.x, ray.viewDir.y);
     if(keyIsDown("S".charCodeAt(0)) || keyIsDown(DOWN_ARROW)) ray.velShift(-ray.viewDir.x, -ray.viewDir.y);
-
-    if(keyIsDown("A".charCodeAt(0))) ray.velShift(cos(radians(lookAngle-90)), sin(radians(lookAngle-90)));
-    if(keyIsDown("D".charCodeAt(0))) ray.velShift(cos(radians(lookAngle+90)), sin(radians(lookAngle+90)));
+    
+    if(!((keyIsDown("D".charCodeAt(0)) && keyIsDown("A".charCodeAt(0))))){
+        if(keyIsDown("A".charCodeAt(0))) ray.velShift(cos(radians(lookAngle-90)), sin(radians(lookAngle-90)));
+        if(keyIsDown("D".charCodeAt(0))) ray.velShift(cos(radians(lookAngle+90)), sin(radians(lookAngle+90)));
+    }
 
     ray.move();
     ray.vel(0, 0);
@@ -51,15 +54,19 @@ function draw(){
         drawMap(mapBuffer);
         image(mapBuffer, 0, 0);
     } else{
+        tDBuffer.rectMode(CORNER);
         tDBuffer.background(0);
         tDBuffer.fill(128,0,0);
-        tDBuffer.rectMode(CORNER);
-        tDBuffer.rect(0, height/2, width, height/2);
+        tDBuffer.rect(0, height/2, width, height/2); 
+        tDBuffer.fill(0,0,128);
+        tDBuffer.rect(0,0,width,height/2);
         drawWalls3D(tDBuffer, vertices);
-        drawMap(mapBuffer);
-        mapBuffer.copy(floor(ray.pos.x-100), floor(ray.pos.y-100), 200, 200, 0, 0, 200, 200);
         image(tDBuffer, 0, 0);
-        image(mapBuffer, width-250, height-250, 200, 200, 0, 0 , 200, 200);
+        if(showMinimap){
+            drawMap(mapBuffer);
+            mapBuffer.copy(floor(ray.pos.x-100), floor(ray.pos.y-100), 200, 200, 0, 0, 200, 200);
+            image(mapBuffer, width-250, height-250, 200, 200, 0, 0 , 200, 200);
+        }
     }
 }
 
@@ -116,6 +123,7 @@ function drawWalls3D(bufferContext, vertices){
     bufferContext.rectMode(CENTER);
     for(viewPoint in vertices){
         let p = vertices[viewPoint];
+        let angle = map(viewPoint, 0, numRays, 0, fov)-fov/2;
         bufferContext.fill(255/p.z*gridDimensions[2]/2);
         bufferContext.stroke(255/p.z*gridDimensions[2]/2);
         bufferContext.rect(viewPoint*width/numRays, height/2, width/numRays, height*20/p.z);
@@ -140,18 +148,21 @@ function calcVertices(){
         }
         if(record < Infinity){
             vertices.push(createVector(closest.x, closest.y, closest.z));
-        }   
+        } else{
+            vertices.push(createVector(0, 0, Infinity));
+        }
     }
 }
-
+    
 function mousePressed(){
     if(!showWalls) ray.pos = createVector(mouseX, mouseY);
 }
 
 function keyTyped(){
-    if(key == "m") showWalls = !showWalls;
-    if(key == " ") rotating = !rotating;
-    if(key == "n") letFill = !letFill;
+    if(key == "1") showWalls = !showWalls;
+    if(key == "2") rotating = !rotating;
+    if(key == "3") letFill = !letFill;
+    if(key == "4") showMinimap = !showMinimap;
 }
 
 
