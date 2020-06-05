@@ -6,14 +6,14 @@ let showMinimap = true;
 let numRays = 500;
 let i = 0;
 let speed = 5;
-let gridDimensions = [38, 18, 50];
+let gridDimensions = [25, 38, 50];
 let lookAngle = 0;
 let fov = 110;
 let rotating = !true;
 let mapBuffer, tDBuffer, vertices, ray;
 
 function setup(){
-    let canvas = createCanvas(1900,900);
+    let canvas = createCanvas(window.innerWidth,window.innerHeight);
     tDBuffer = createGraphics(width, height);
     mapBuffer = createGraphics(width, height);
     ray = new Ray(width/2-gridDimensions[2]/2, height/2-gridDimensions[2]/2, mapBuffer);
